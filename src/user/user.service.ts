@@ -1,17 +1,29 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { ChangePasswordDto } from "./dot/change.password.dto";
-import { Repository, UpdateQueryBuilder } from "typeorm";
+import { Request } from "express";
+import { Repository } from "typeorm";
 import { UserEntity } from "../entities/user.entity";
 import { InjectRepository } from "@nestjs/typeorm";
+import { UpdateProfileDto } from "./dot/update.profile.dto";
+import { RecipeEntity } from "../entities/recipe.entity";
+import { S3Service } from "../s3/s3.service";
 import * as jwt from "jsonwebtoken";
 import * as bcrypt from "bcrypt";
-import { UpdateProfileDto } from "./dot/update.profile.dto";
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+
+    @InjectRepository(RecipeEntity)
+    private readonly recipeRepository: Repository<RecipeEntity>,
+
+    private readonly s3Service: S3Service,
   ) {}
 
   async getUserProfileByName(userName: string) {
@@ -36,7 +48,7 @@ export class UserService {
       .getOne();
 
     if (!user) {
-      throw new BadRequestException("User not found");
+      throw new NotFoundException("User not found");
     }
 
     return user;
@@ -65,7 +77,7 @@ export class UserService {
       .getOne();
 
     if (!user) {
-      throw new BadRequestException("User not found");
+      throw new NotFoundException("User not found");
     }
 
     return user;
@@ -118,7 +130,7 @@ export class UserService {
     });
 
     if (user == null) {
-      throw new BadRequestException("User not found");
+      throw new NotFoundException("User not found");
     }
 
     const oldPasswordIsEqualUserPassword: boolean = await bcrypt.compare(
@@ -140,5 +152,53 @@ export class UserService {
     );
 
     return { message: "Password has been successfully updated" };
+  }
+
+  async deleteAccount(req: Request) {
+    const { password } = req.body;
+    const userToken = req.cookies.token;
+    console.log("zxc123");
+
+    if (!password) {
+      throw new BadRequestException("Password is required");
+    }
+
+    const userId = (jwt.decode(userToken) as Record<string, string>).userId;
+
+    const user: UserEntity | null = await this.userRepository.findOne({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (user == null) {
+      throw new NotFoundException("User not found");
+    }
+
+    const hashPassword: boolean = await bcrypt.compare(password, user.password);
+
+    if (!hashPassword) {
+      throw new BadRequestException("Invalid password");
+    }
+
+    const userRecipes = await this.recipeRepository.find({
+      where: {
+        creator_id: userId,
+      },
+      select: ["id", "image"],
+    });
+
+    const imagesName = userRecipes.map((val) => {
+      const imageName = val.image.split(/\//);
+      return imageName[imageName.length - 1];
+    });
+
+    for (let i = 0; i < imagesName.length; i++) {
+      await this.s3Service.deleteFile(imagesName[i]);
+    }
+
+    await this.userRepository.delete({ id: userId });
+
+    return { message: "Account has been successfully deleted" };
   }
 }

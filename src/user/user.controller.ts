@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Put,
@@ -60,6 +61,13 @@ export class UserController {
       changePasswordDto,
       userToken,
     );
+    return message;
+  }
+
+  @UseGuards(AuthGuard)
+  @Delete("delete/account")
+  async deleteAccount(@Req() req: Request) {
+    const message = await this.userService.deleteAccount(req);
     return message;
   }
 }

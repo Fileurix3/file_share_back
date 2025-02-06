@@ -25,6 +25,7 @@ describe("AuthController", () => {
             getYourProfile: jest.fn(),
             changePassword: jest.fn(),
             updateUserProfile: jest.fn(),
+            deleteAccount: jest.fn(),
           },
         },
       ],
@@ -142,6 +143,22 @@ describe("AuthController", () => {
       changePasswordDto,
       mockReq.cookies!.token,
     );
+    expect(response).toEqual(result);
+  });
+
+  it("DELETE /user/delete/account - must call the UserService deleteAccount method and return correct data", async () => {
+    const result = { message: "Account has been successfully deleted" };
+
+    jest.spyOn(userService, "deleteAccount").mockResolvedValueOnce(result);
+
+    const newMockReq: Partial<Request> = {
+      cookies: { token: "test-token" },
+      body: { password: "password" },
+    };
+
+    const response = await userController.deleteAccount(newMockReq as Request);
+
+    expect(userService.deleteAccount).toHaveBeenCalledWith(newMockReq);
     expect(response).toEqual(result);
   });
 });
