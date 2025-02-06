@@ -1,0 +1,492 @@
+openapi: 3.0.3
+info:
+  title: Recipe_nest api documentation
+
+servers:
+  - url: "http://localhost:3000"
+
+tags:
+  - name: auth
+    description: auth
+
+  - name: recipe
+    description: recipes
+
+  - name: user
+    description: users
+
+paths:
+  /auth/register:
+    post:
+      tags:
+        - auth
+      summary: register a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                email:
+                  type: string
+                  example: "example@example.com"
+                name:
+                  type: string
+                  example: "example name"
+                password:
+                  type: string
+                  example: "example password"
+      responses:
+        201:
+          description: register successfully
+          content:
+            application/json:
+              schema:
+                properties:
+                  massage:
+                    type: string
+                    example: "User has been successfully registered"
+
+  /auth/login:
+    post:
+      tags:
+        - auth
+      summary: login a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                email:
+                  type: string
+                  example: "example@example.com"
+                password:
+                  type: string
+                  example: "example password"
+      responses:
+        200:
+          description: login successfully
+          content:
+            application/json:
+              schema:
+                properties:
+                  massage:
+                    type: string
+                    example: "Login has been successfully"
+
+  /auth/logout:
+    get:
+      tags:
+        - auth
+      summary: logout a user
+      responses:
+        200:
+          description: logout successfully
+          content:
+            application/json:
+              schema:
+                properties:
+                  massage:
+                    type: string
+                    example: "logout successfully"
+
+  /recipe/get/{recipeId}:
+    get:
+      tags:
+        - recipe
+      summary: get recipe by id
+      parameters:
+        - name: recipeId
+          in: path
+          description: "Recipe id"
+          required: true
+          schema:
+            type: string
+            example: "recipeId"
+      responses:
+        200:
+          description: get the recipe successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "recipe id"
+                  title:
+                    type: string
+                    example: "recipe title"
+                  description:
+                    type: string
+                    example: "recipe description"
+                  steps:
+                    type: array
+                    items:
+                      type: string
+                    example:
+                      ["1: Mix ingredients", "2: Fry on a pan", "3: Serve hot"]
+                  ingredients:
+                    type: array
+                    items:
+                      type: string
+                    example: ["Eggs", "Milk"]
+                  cook_time_seconds:
+                    type: integer
+                    example: 600
+                  cook_time:
+                    type: string
+                    example: "10m"
+                  category:
+                    type: string
+                    example: "Breakfast"
+                  difficulty:
+                    type: string
+                    example: "Easy"
+                  image:
+                    type: string
+                    example: "https://example.com/image.jpg"
+                  created_at:
+                    type: string
+                    format: date-time
+                    example: "2025-02-06T12:00:00Z"
+                  creator:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: "creator id"
+                      name:
+                        type: string
+                        example: "creator nme"
+                      avatar_url:
+                        type: string
+                        example: "https://example.com/avatar.jpg"
+
+  /recipe/search:
+    get:
+      tags:
+        - recipe
+      summary: get recipe by id
+      parameters:
+        - name: category
+          in: query
+          description: Category of the recipe
+          required: false
+          schema:
+            type: string
+            example: "Breakfast"
+        - name: difficulty
+          in: query
+          description: Difficulty level of the recipe
+          required: false
+          schema:
+            type: string
+            example: "Easy"
+        - name: maxCookTime
+          in: query
+          description: maximum cooking time
+          required: false
+          schema:
+            type: string
+            example: 30m
+        - name: minCookTime
+          in: query
+          description: minimum cooking time
+          required: false
+          schema:
+            type: string
+            example: 5m
+        - name: limit
+          in: query
+          description: Maximum number of recipes to return
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+            example: 20
+        - name: offset
+          in: query
+          description: Number of recipes to skip (for pagination)
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+            example: 0
+      responses:
+        200:
+          description: get the recipes successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  - id: "recipe id"
+                    creator_id: "creator id"
+                    title: "recipe title"
+                    description: recipe description"
+                    steps:
+                      ["1: Mix ingredients", "2: Fry on a pan", "3: Serve hot"]
+                    ingredients: ["Eggs", "Milk"]
+                    cook_time_seconds: 600
+                    cook_time: "10m"
+                    category: "Breakfast"
+                    difficulty: "Easy"
+                    image: "https://example.com/image.jpg"
+                    created_at: "2025-02-06T12:00:00Z"
+                  - id: "recipe id 2"
+                    creator_id: "creator id 2"
+                    title: "recipe title 200:"
+                    description: recipe description 2"
+                    steps:
+                      ["1: Mix ingredients", "2: Fry on a pan", "3: Serve hot"]
+                    ingredients: ["Eggs", "Milk"]
+                    cook_time_seconds: 1800
+                    cook_time: "30m"
+                    category: "Lunch"
+                    difficulty: "Normal"
+                    image: "https://example.com/image.jpg"
+                    created_at: "2025-02-06T12:00:00Z"
+
+  /recipe/create:
+    post:
+      tags:
+        - recipe
+      summary: create new recipe
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: "object"
+              properties:
+                title:
+                  type: string
+                  example: "Delicious Pancakes"
+                description:
+                  type: string
+                  example: description
+                steps:
+                  type: array
+                  items:
+                    type: string
+                  example:
+                    ["1: Mix ingredients", "2: Fry on a pan", "3: Serve hot"]
+                ingredients:
+                  type: array
+                  items: { type: string }
+                  example: ["eggs", "Milk"]
+                cook_time:
+                  type: string
+                  example: 10h
+                category:
+                  type: string
+                  example: Lunch
+                difficulty:
+                  type: string
+                  example: Easy
+                image:
+                  type: string
+                  format: binary
+      responses:
+        201:
+          description: Recipe has been successfully created
+          content:
+            application/json:
+              schema:
+                properties:
+                  massage:
+                    type: string
+                    example: Recipe has been successfully created
+
+  /recipe/delete/{recipeId}:
+    delete:
+      tags:
+        - recipe
+      summary: delete recipe
+      parameters:
+        - name: recipeId
+          in: path
+          description: "Recipe id"
+          required: true
+          schema:
+            type: string
+            example: "recipeId"
+      responses:
+        200:
+          description: delete the recipe successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Recipe has been successfully deleted
+
+  /user/profile/{userName}:
+    get:
+      tags:
+        - user
+      summary: get user profile by id
+      parameters:
+        - name: userName
+          in: path
+          description: "user name"
+          required: true
+          schema:
+            type: string
+            format: userName
+      responses:
+        200:
+          description: get the user successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: "userId"
+                      name:
+                        type: string
+                        example: "user name"
+                      created_at:
+                        type: string
+                        format: date-time
+                        example: "2021-01-01T12:00:00Z"
+                      avatar_url:
+                        type: string
+                        example: "https://example.com/avatar.jpg"
+                      recipes:
+                        type: array
+                        example:
+                          - id: "recipe id 1"
+                            title: "recipe title 1"
+                            difficulty: "Easy"
+                            category: "Lunch"
+                            ingredients: ["egg"]
+                            image: "image url"
+                            cook_time: "10m"
+                            cook_time_seconds: 600
+                          - id: "recipe id 2"
+                            title: "recipe title 2"
+                            difficulty: "Easy"
+                            category: "Lunch"
+                            ingredients: ["egg"]
+                            image: "image url"
+                            cook_time: "10m"
+                            cook_time_seconds: 600
+
+  /user/profile:
+    get:
+      tags:
+        - user
+      summary: get your profile using the jwt token
+      responses:
+        200:
+          description: get profile successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: "userId"
+                      name:
+                        type: string
+                        example: "user name"
+                      created_at:
+                        type: string
+                        format: date-time
+                        example: "2021-01-01T12:00:00Z"
+                      avatar_url:
+                        type: string
+                        example: "https://example.com/avatar.jpg"
+                      recipes:
+                        type: array
+                        example:
+                          - id: "recipe id 1"
+                            title: "recipe title 1"
+                            difficulty: "Easy"
+                            category: "Lunch"
+                            ingredients: ["egg"]
+                            image: "image url"
+                            cook_time: "10m"
+                            cook_time_seconds: 600
+                          - id: "recipe id 2"
+                            title: "recipe title 2"
+                            difficulty: "Easy"
+                            category: "Lunch"
+                            ingredients: ["egg"]
+                            image: "image url"
+                            cook_time: "10m"
+                            cook_time_seconds: 600
+
+  /user/update/profile:
+    put:
+      tags:
+        - user
+      summary: update user profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                newName:
+                  type: string
+                  example: "example name"
+                newAvatarUrl:
+                  type: string
+                  example: "example avatar url"
+      responses:
+        200:
+          description: User profile has been successfully updated
+          content:
+            application/json:
+              schema:
+                properties:
+                  massage:
+                    type: string
+                    example: User profile has been successfully updated
+
+  /user/change/password:
+    put:
+      tags:
+        - user
+      summary: change user password
+      description: the old password and the new password must not be the same
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                oldPassword:
+                  type: string
+                  example: "example old password"
+                newPassword:
+                  type: string
+                  example: "example new password"
+      responses:
+        200:
+          description: "Password was successfully update"
+          content:
+            application/json:
+              schema:
+                properties:
+                  massage:
+                    type: string
+                    example: "Password has been successfully updated"
