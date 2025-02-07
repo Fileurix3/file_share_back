@@ -2,8 +2,8 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { UserController } from "./user.controller";
 import { UserService } from "./user.service";
 import { Request } from "express";
-import { ChangePasswordDto } from "./dot/change.password.dto";
-import { UpdateProfileDto } from "./dot/update.profile.dto";
+import { ChangePasswordDto } from "./dto/change.password.dto";
+import { UpdateProfileDto } from "./dto/update.profile.dto";
 
 describe("AuthController", () => {
   let userController: UserController;

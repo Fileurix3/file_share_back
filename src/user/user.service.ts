@@ -3,12 +3,12 @@ import {
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
-import { ChangePasswordDto } from "./dot/change.password.dto";
+import { ChangePasswordDto } from "./dto/change.password.dto";
 import { Request } from "express";
 import { Repository } from "typeorm";
 import { UserEntity } from "../entities/user.entity";
 import { InjectRepository } from "@nestjs/typeorm";
-import { UpdateProfileDto } from "./dot/update.profile.dto";
+import { UpdateProfileDto } from "./dto/update.profile.dto";
 import { RecipeEntity } from "../entities/recipe.entity";
 import { S3Service } from "../s3/s3.service";
 import * as jwt from "jsonwebtoken";

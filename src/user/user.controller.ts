@@ -13,8 +13,8 @@ import {
 import { UserService } from "./user.service";
 import { Request } from "express";
 import { AuthGuard } from "../guards/auth.guard";
-import { ChangePasswordDto } from "./dot/change.password.dto";
-import { UpdateProfileDto } from "./dot/update.profile.dto";
+import { ChangePasswordDto } from "./dto/change.password.dto";
+import { UpdateProfileDto } from "./dto/update.profile.dto";
 
 @Controller("user")
 export class UserController {
